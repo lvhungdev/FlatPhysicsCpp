@@ -94,7 +94,7 @@ float FlatVector::getLengthSquared() const
 
 FlatVector FlatVector::getNormalized() const
 {
-	if (x == 0.0f && y == 0.0f) return { 0.0f, 0.0f };
+	if (x == 0.0f && y == 0.0f) return FlatVector(0.0f, 0.0f);
 
 	return *this / getLength();
 }
