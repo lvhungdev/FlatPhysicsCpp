@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(SDL2 REQUIRED)
 
 if (MSVC)
-    include_directories(FlatPhysics .)
+    include_directories(FlatPhysics . Physics)
 else ()
-    include_directories(FlatPhysics . ${SDL2_INCLUDE_DIRS})
+    include_directories(FlatPhysics . Physics ${SDL2_INCLUDE_DIRS})
 endif ()
 
 file(GLOB SourceFiles Renderer/*.cpp Physics/*.cpp Physics/Core/*.cpp Physics/Collision/*.cpp Physics/Utils/*.cpp)

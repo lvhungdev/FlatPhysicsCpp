@@ -10,5 +10,9 @@ public:
     FlatVector linearAcceleration;
     float inverseMass = 1.0f;
 
+    float restitution = 0.9f;
+
     void integrate(float delta);
+
+    void applyImpulse(const FlatVector& impulse);
 };

@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "Renderer/Settings.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/Converter.h"
 #include "Physics/PhysicWorld.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
@@ -13,11 +14,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     Renderer renderer = Renderer(sdlRenderer);
 
-    FlatBody* body = new FlatBody();
-    body->position = FlatVector(2.0f, 2.0f);
-
     PhysicWorld world = PhysicWorld();
-    world.addBody(body);
+    world.gravity = FlatVector(0.0f, -9.8f);
 
     const int FPS = 60;
     const int TICKS_PER_FRAME = 1000 / FPS;
@@ -38,14 +36,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
             {
                 break;
             }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int mouseX;
+                int mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+                FlatVector pos = Converter::convert(SDL_Point{ mouseX, mouseY });
+
+                FlatBody* body = new FlatBody();
+                body->position = FlatVector(pos.x, pos.y);
+
+                world.addBody(body);
+            }
         }
 
         SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
         SDL_RenderClear(sdlRenderer);
 
-        for (FlatBody* item : world.getBodies())
+        for (FlatBody* item : world.bodies)
         {
-            renderer.drawCircle(item->position, 0.3f);
+            renderer.drawCircle(item->position, 0.2f);
         }
 
         SDL_RenderPresent(sdlRenderer);
@@ -59,6 +70,27 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         }
 
         world.integrate(delta);
+
+        for (FlatBody* item : world.bodies)
+        {
+            if (item->position.y < 0.2f)
+            {
+                item->position.y = 0.2f;
+                item->linearVelocity.y *= -1;
+            }
+
+            if (item->position.x < 0.2f)
+            {
+                item->position.x = 0.2f;
+                item->linearVelocity.x *= -1;
+            }
+
+            if (item->position.x > (float)Settings::SCREEN_WIDTH / Settings::SCALE_FACTOR - 0.2f)
+            {
+                item->position.x = (float)Settings::SCREEN_WIDTH / Settings::SCALE_FACTOR - 0.2f;
+                item->linearVelocity.x *= -1;
+            }
+        }
     }
 
     return 0;

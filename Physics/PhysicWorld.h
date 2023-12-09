@@ -8,14 +8,11 @@ class PhysicWorld
 public:
     ~PhysicWorld();
 
+    FlatVector gravity;
     int integrationSteps = 2;
+    std::vector<FlatBody*> bodies;
 
     void integrate(float delta);
 
     void addBody(FlatBody* body);
-
-    std::vector<FlatBody*> getBodies() const;
-
-private:
-    std::vector<FlatBody*> bodies;
 };
