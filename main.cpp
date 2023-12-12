@@ -3,6 +3,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/Converter.h"
 #include "Physics/PhysicWorld.h"
+#include "Physics/Factory.h"
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
@@ -14,16 +15,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     Renderer renderer = Renderer(sdlRenderer);
 
-    FlatBody* obstacle = new FlatBody();
-    obstacle->position = FlatVector(4.0f, 4.0f);
-    obstacle->flatShape.type = FlatShapeType::Circle;
-    obstacle->flatShape.radius = 0.6f;
-    obstacle->inverseMass = 0.0f;
-    obstacle->inverseInertia = 0.0f;
+    FlatBody* obstacle1 = Factory::createStaticBoxBody({ 6.0f, 4.0f }, 3.0f, 0.2f);
+    obstacle1->rotation = 0.6f;
+
+    FlatBody* obstacle2 = Factory::createStaticBoxBody({ 2.0f, 4.0f }, 3.0f, 0.2f);
+    obstacle2->rotation = -1.0f;
+
+    FlatBody* ground = Factory::createStaticBoxBody({ 4.0f, 0.0f }, 8.0f, 0.2f);
+    FlatBody* leftWall = Factory::createStaticBoxBody({ 0.0f, 0.0f }, 0.2f, 12.0f);
+    FlatBody* rightWall = Factory::createStaticBoxBody({ 8.0f, 0.0f }, 0.2f, 12.0f);
 
     PhysicWorld world = PhysicWorld();
     world.gravity = FlatVector(0.0f, -9.8f);
-    world.addBody(obstacle);
+    world.addBody(obstacle1);
+    world.addBody(obstacle2);
+    world.addBody(leftWall);
+    world.addBody(rightWall);
+    world.addBody(ground);
 
     const int FPS = 60;
     const int TICKS_PER_FRAME = 1000 / FPS;
@@ -52,11 +60,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
                 SDL_GetMouseState(&mouseX, &mouseY);
                 FlatVector pos = Converter::convert(SDL_Point{ mouseX, mouseY });
 
-                FlatBody* body = new FlatBody();
-                body->position = FlatVector(pos.x, pos.y);
-                body->flatShape.type = FlatShapeType::Circle;
-                body->flatShape.radius = 0.2f;
-
+                FlatBody* body = Factory::createBoxBody(pos, 0.4f, 0.4f);
                 world.addBody(body);
             }
         }
@@ -66,7 +70,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
         for (FlatBody* item : world.bodies)
         {
-            renderer.drawCircle(item->position, item->flatShape.radius, item->rotation);
+            if (item->shape.type == FlatShapeType::Circle)
+            {
+                renderer.drawCircle(item->position, item->shape.radius, item->rotation);
+            } else if (item->shape.type == FlatShapeType::Polygon)
+            {
+                renderer.drawPolygon(item->vertices, item->vertexCount);
+            }
         }
 
         SDL_RenderPresent(sdlRenderer);
@@ -80,27 +90,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         }
 
         world.integrate(delta);
-
-        for (FlatBody* item : world.bodies)
-        {
-            if (item->position.y < 0.2f)
-            {
-                item->position.y = 0.2f;
-                item->linearVelocity.y *= -1;
-            }
-
-            if (item->position.x < 0.2f)
-            {
-                item->position.x = 0.2f;
-                item->linearVelocity.x *= -1;
-            }
-
-            if (item->position.x > (float)Settings::SCREEN_WIDTH / Settings::SCALE_FACTOR - 0.2f)
-            {
-                item->position.x = (float)Settings::SCREEN_WIDTH / Settings::SCALE_FACTOR - 0.2f;
-                item->linearVelocity.x *= -1;
-            }
-        }
     }
 
     return 0;

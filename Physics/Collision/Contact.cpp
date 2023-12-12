@@ -7,10 +7,11 @@ Contact::~Contact()
     // If both bodies are circles, we will delete contact points since it does not belong to any shape
     // Else if both are polygons, the contact points are one of the vertex of the bodies (body->vertices) and
     // it is the responsibility for the body to delete the vertex
-    if (bodyA->flatShape.type == FlatShapeType::Circle && bodyB->flatShape.type == FlatShapeType::Circle)
+    if (bodyA->shape.type == FlatShapeType::Circle && bodyB->shape.type == FlatShapeType::Circle)
     {
         delete point1;
-        if (point2 != point1) {
+        if (point2 != point1)
+        {
             delete point2;
         }
     }

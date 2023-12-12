@@ -55,3 +55,18 @@ void Renderer::drawCircle(const FlatVector& position, float radius, float rotati
 
     SDL_RenderDrawLine(renderer, centreX, centreY, rotatedPoint.x, rotatedPoint.y);
 }
+
+void Renderer::drawPolygon(FlatVector* vertices, int vertexCount, SDL_Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+    SDL_Point points[4];
+
+    for (int i = 0; i < vertexCount; i++)
+    {
+        points[i] = Converter::convert(vertices[i]);
+    }
+
+    SDL_RenderDrawLines(renderer, points, vertexCount);
+    SDL_RenderDrawLine(renderer, points[0].x, points[0].y, points[vertexCount - 1].x, points[vertexCount - 1].y);
+}
