@@ -1,10 +1,19 @@
 #include <algorithm>
 #include "Contact.h"
+#include "Core/FlatShape.h"
 
 Contact::~Contact()
 {
-    delete point1;
-    delete point2;
+    // If both bodies are circles, we will delete contact points since it does not belong to any shape
+    // Else if both are polygons, the contact points are one of the vertex of the bodies (body->vertices) and
+    // it is the responsibility for the body to delete the vertex
+    if (bodyA->flatShape.type == FlatShapeType::Circle && bodyB->flatShape.type == FlatShapeType::Circle)
+    {
+        delete point1;
+        if (point2 != point1) {
+            delete point2;
+        }
+    }
 }
 
 void Contact::resolve()
@@ -24,8 +33,6 @@ void Contact::resolvePenetration() const
 
     bodyA->position -= normal * penetration * (bodyA->inverseMass / totalInverseMass);
     bodyB->position += normal * penetration * (bodyB->inverseMass / totalInverseMass);
-
-    // TODO Adjust contact points after resolving penetration
 }
 
 void Contact::resolveVelocity()
@@ -40,8 +47,8 @@ void Contact::resolveVelocity()
     FlatVector impulseAlongNormal2 = normal * calculateImpulseAtPoint(*point2, normal) * 0.5f;
 
     FlatVector normalPerp = normal.getPerpendicular();
-    FlatVector friction1 = normalPerp * calculateImpulseAtPoint(*point1, normalPerp) * 0.5f * 0.2f;
-    FlatVector friction2 = normalPerp * calculateImpulseAtPoint(*point2, normalPerp) * 0.5f * 0.2f;
+    FlatVector friction1 = normalPerp * calculateImpulseAtPoint(*point1, normalPerp) * 0.5f * 0.1f;
+    FlatVector friction2 = normalPerp * calculateImpulseAtPoint(*point2, normalPerp) * 0.5f * 0.1f;
 
     bodyA->applyImpulse((impulseAlongNormal1 + friction1) * -1, *point1);
     bodyA->applyImpulse((impulseAlongNormal2 + friction2) * -1, *point2);

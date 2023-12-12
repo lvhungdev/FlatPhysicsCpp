@@ -6,5 +6,5 @@
 class CollisionDetector
 {
 public:
-    static bool detect(FlatBody* body1, FlatBody* body2, Contact* outContact);
+    static bool detect(FlatBody* bodyA, FlatBody* bodyB, Contact* outContact);
 };
