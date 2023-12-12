@@ -5,13 +5,14 @@ bool circleVsCircle(FlatVector& circle1Center, float circle1Radius, FlatVector& 
 
 bool CollisionDetector::detect(FlatBody* body1, FlatBody* body2, Contact* outContact)
 {
-    if (outContact != nullptr) {
+    if (outContact != nullptr)
+    {
         outContact->bodyA = body1;
         outContact->bodyB = body2;
     }
 
-    // TODO Replace 0.2f with actual radius when shape is implemented
-    return circleVsCircle(body1->position, 0.2f, body2->position, 0.2f, outContact);
+    return circleVsCircle(body1->position, body1->flatShape.radius, body2->position, body2->flatShape.radius,
+            outContact);
 }
 
 bool circleVsCircle(FlatVector& circle1Center, float circle1Radius, FlatVector& circle2Center, float circle2Radius,
@@ -26,8 +27,8 @@ bool circleVsCircle(FlatVector& circle1Center, float circle1Radius, FlatVector& 
 
     outContact->penetration = penetration;
     outContact->normal = (circle2Center - circle1Center).getNormalized();
-    outContact->point1 = new FlatVector(circle1Center + outContact->normal * penetration);
-    outContact->point2 = new FlatVector(circle2Center - outContact->normal * penetration);
+    outContact->point1 = new FlatVector(circle1Center + outContact->normal * circle1Radius);
+    outContact->point2 = new FlatVector(circle2Center - outContact->normal * circle2Radius);
 
     return true;
 }

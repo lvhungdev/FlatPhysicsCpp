@@ -21,12 +21,15 @@ void PhysicWorld::integrate(float delta)
             body->integrate(localDelta);
         }
 
-        for (int i = 0; i < bodies.size(); i++) {
-            for (int j = i + 1; j < bodies.size(); j++) {
+        for (int i = 0; i < bodies.size(); i++)
+        {
+            for (int j = i + 1; j < bodies.size(); j++)
+            {
                 Contact contact;
                 bool isCollided = CollisionDetector::detect(bodies[i], bodies[j], &contact);
 
-                if (isCollided) {
+                if (isCollided)
+                {
                     contact.resolve();
                 }
             }
@@ -38,7 +41,10 @@ void PhysicWorld::addBody(FlatBody* body)
 {
     if (body != nullptr)
     {
-        body->linearAcceleration += gravity;
+        if (body->inverseMass != 0.0f)
+        {
+            body->linearAcceleration += gravity;
+        }
         bodies.push_back(body);
     }
 }

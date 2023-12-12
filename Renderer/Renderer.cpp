@@ -7,7 +7,7 @@ Renderer::Renderer(SDL_Renderer* renderer)
     this->renderer = renderer;
 }
 
-void Renderer::drawCircle(const FlatVector& position, float radius, SDL_Color color)
+void Renderer::drawCircle(const FlatVector& position, float radius, float rotation, SDL_Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
@@ -49,4 +49,9 @@ void Renderer::drawCircle(const FlatVector& position, float radius, SDL_Color co
             error += (tx - diameter);
         }
     }
+
+    FlatVector rotatedLine = FlatVector(1, 0).getRotated(rotation);
+    SDL_Point rotatedPoint = Converter::convert(position + rotatedLine * radius);
+
+    SDL_RenderDrawLine(renderer, centreX, centreY, rotatedPoint.x, rotatedPoint.y);
 }

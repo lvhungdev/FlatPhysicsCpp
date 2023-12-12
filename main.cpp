@@ -14,8 +14,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     Renderer renderer = Renderer(sdlRenderer);
 
+    FlatBody* obstacle = new FlatBody();
+    obstacle->position = FlatVector(4.0f, 4.0f);
+    obstacle->flatShape.type = FlatShapeType::Circle;
+    obstacle->flatShape.radius = 0.6f;
+    obstacle->inverseMass = 0.0f;
+    obstacle->inverseInertia = 0.0f;
+
     PhysicWorld world = PhysicWorld();
     world.gravity = FlatVector(0.0f, -9.8f);
+    world.addBody(obstacle);
 
     const int FPS = 60;
     const int TICKS_PER_FRAME = 1000 / FPS;
@@ -46,6 +54,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
                 FlatBody* body = new FlatBody();
                 body->position = FlatVector(pos.x, pos.y);
+                body->flatShape.type = FlatShapeType::Circle;
+                body->flatShape.radius = 0.2f;
 
                 world.addBody(body);
             }
@@ -56,7 +66,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
         for (FlatBody* item : world.bodies)
         {
-            renderer.drawCircle(item->position, 0.2f);
+            renderer.drawCircle(item->position, item->flatShape.radius, item->rotation);
         }
 
         SDL_RenderPresent(sdlRenderer);

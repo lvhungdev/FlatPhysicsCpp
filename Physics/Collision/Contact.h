@@ -22,5 +22,7 @@ public:
 private:
     void resolvePenetration() const;
 
-    void resolveVelocity() const;
+    void resolveVelocity();
+
+    float calculateImpulseAtPoint(const FlatVector& point, const FlatVector& contactNormal) const;
 };
